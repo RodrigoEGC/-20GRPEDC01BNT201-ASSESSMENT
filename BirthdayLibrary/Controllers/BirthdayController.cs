@@ -11,18 +11,17 @@ namespace BirthdayLibrary.Controllers
 {
     public class BirthdayController : Controller
     {
-        private readonly BirthdayRepositories _birthdayRepository;
+        private readonly IBirthdayDB _birthdayDB;
 
-        public BirthdayController(BirthdayRepositories birthdayRepositories)
+        public BirthdayController(IBirthdayDB birthdayDB)
         {
-            _birthdayRepository = birthdayRepositories;
+            _birthdayDB = birthdayDB;
         }
         // GET: Birthday
         public ActionResult Index()
         {
-            IEnumerable<BirthdayModel> birthdayModel
-                = _birthdayRepository.GetAll();
-            return View(birthdayModel);
+            var birthday = _birthdayDB.GetAll();
+            return View(birthday);
         }
 
         // GET: Birthday/Details/5
@@ -45,7 +44,7 @@ namespace BirthdayLibrary.Controllers
             try
             {
                 // TODO: Add insert logic here
-                _birthdayRepository.Insert(birthdayModel);
+                _birthdayDB.Insert(birthdayModel);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -56,9 +55,18 @@ namespace BirthdayLibrary.Controllers
         }
 
         // GET: Birthday/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+            BirthdayModel birthdayModel = _birthdayDB.GetById(id);
+            if(birthdayModel == null)
+            {
+                return NotFound();
+            }
+            return View(birthdayModel);
         }
 
         // POST: Birthday/Edit/5

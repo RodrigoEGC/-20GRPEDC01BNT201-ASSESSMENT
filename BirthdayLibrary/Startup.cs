@@ -25,7 +25,7 @@ namespace BirthdayLibrary
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddTransient<BirthdayRepositories>();
+            services.AddTransient<IBirthdayDB, BirthdayRepositories>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

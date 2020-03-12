@@ -13,3 +13,9 @@ SELECT * FROM Birthday;
 DROP TABLE Birthday;
 
 SELECT Id as Id, Nome as Nome, Sobrenome as Sobrenome FROM Birthday ORDER BY DataNascimento DESC
+
+UPDATE Birthday
+	SET 
+		Nome = 'Saul', Sobrenome = 'Hudson', DataNascimento = '1965-07-06'
+	WHERE
+		Id = 1;
