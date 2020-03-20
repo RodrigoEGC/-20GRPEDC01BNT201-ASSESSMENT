@@ -11,7 +11,10 @@ namespace BirthdayLibrary.Repositories
         IEnumerable<BirthdayModel> GetAll();
         void Insert(BirthdayModel birthdayModel);
         void Update(BirthdayModel birthdayModel);
-        BirthdayModel GetById(int? Id);
-        void Delete(int? id);
+        BirthdayModel GetById(int Id);
+        void Delete(int id);
+
+        List<BirthdayModel> Buscar(int offset, int limit );
+        int Total();
     }
 }

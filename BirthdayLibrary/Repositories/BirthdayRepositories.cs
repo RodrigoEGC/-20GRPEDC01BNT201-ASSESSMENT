@@ -44,9 +44,7 @@ namespace BirthdayLibrary.Repositories
 
         public void Update(BirthdayModel birthdayModel)
         {
-            var cmdText = "UPDATE Birthday" +
-                "SET	(Nome, Sobrenome, DataNascimento)" +
-                "VALUES	(@nome, @sobrenome, @dataNascimento);";
+            var cmdText = "UPDATE Birthday SET Nome = @nome, Sobrenome = @sobrenome, DataNascimento = @dataNascimento WHERE Id = @id";
 
             using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
             using (var sqlCommand = new SqlCommand(cmdText, sqlConnection)) //já faz o close
@@ -59,17 +57,19 @@ namespace BirthdayLibrary.Repositories
                     .Add("@sobrenome", SqlDbType.VarChar).Value = birthdayModel.Sobrenome;
                 sqlCommand.Parameters
                     .Add("@dataNascimento", SqlDbType.DateTime).Value = birthdayModel.DataNascimento;
+                sqlCommand.Parameters
+                    .Add("@id", SqlDbType.Int).Value = birthdayModel.Id;
+                
                 sqlConnection.Open();
 
-                var resutScalar = sqlCommand.ExecuteScalar();
+                sqlCommand.ExecuteNonQuery();
             }
         }
-        public IEnumerable<BirthdayModel> GetById(int? Id)
+        public BirthdayModel GetById(int Id)
         {
+           BirthdayModel birthdayModel = new BirthdayModel();
+
             var sqlQuery = "SELECT * FROM Birthday WHERE Id = " + Id;
-
-            var birthdayList = new List<BirthdayModel> ();
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
 
@@ -88,26 +88,16 @@ namespace BirthdayLibrary.Repositories
                         var dataNascimentoColumnIndex = reader.GetOrdinal(nameof(BirthdayModel.DataNascimento));
                         while (reader.Read())
                         {
-                            var id = reader.GetFieldValue<int>(idColumnIndex);
-                            var nome = reader.GetFieldValue<string>(nomeColumnIndex);
-                            var sobrenome = reader.GetFieldValue<string>(sobrenomeColumnIndex);
-                            var dataNascimento = reader.GetFieldValue<DateTime>(dataNascimentoColumnIndex);
-
-                            var entry = new BirthdayModel
-                            {
-                                Id = id,
-                                Nome = nome,
-                                Sobrenome = sobrenome,
-                                DataNascimento = dataNascimento
-                            };
-                            birthdayList.Add(entry);
-
+                            birthdayModel.Id = reader.GetFieldValue<int>(idColumnIndex);
+                            birthdayModel.Nome = reader.GetFieldValue<string>(nomeColumnIndex);
+                            birthdayModel.Sobrenome = reader.GetFieldValue<string>(sobrenomeColumnIndex);
+                            birthdayModel.DataNascimento = reader.GetFieldValue<DateTime>(dataNascimentoColumnIndex);
                         }
                     }
                 }
-                    
+
             }
-            return birthdayList;
+            return birthdayModel;
         }
 
         public IEnumerable<BirthdayModel> GetAll()
@@ -156,14 +146,68 @@ namespace BirthdayLibrary.Repositories
             return birthdayList;
         }
 
-        BirthdayModel IBirthdayDB.GetById(int? Id)
+
+        public void Delete(int id)
         {
-            throw new NotImplementedException();
+            var sql = "DELETE FROM Birthday WHERE Id = @id";
+
+            using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection)) //já faz o close
+            {
+                sqlCommand.CommandType = CommandType.Text;
+
+                sqlCommand.Parameters
+                    .Add("@id", SqlDbType.Int).Value = id;
+
+                sqlConnection.Open();
+
+                sqlCommand.ExecuteNonQuery();
+            }
         }
 
-        public void Delete(int? id)
+        public List<BirthdayModel> Buscar(int porPagina, int paginaCorreta)
         {
-            throw new NotImplementedException();
+            var pagination = new List<BirthdayModel>();
+            var offset = 1;
+            if (paginaCorreta > 1)
+            {
+                offset = (porPagina * (paginaCorreta - 1)) + 1;
+            }
+            var sql = "DECLARE @Limit INT = " + porPagina + ", @Offset INT = " + offset + "; WITH resultado As(SELECT *, ROW_NUMBER() OVER(ORDER BY ID) AS Linha FROM Birthday WHERE Id is not null) SELECT * FROM resultado WHERE linha >= @Offset AND linha<@Offset +@limit";
+
+            using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection)) //já faz o close
+            {
+                sqlConnection.Open();
+                using (SqlDataReader reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        pagination.Add((new BirthdayModel()
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            Nome = reader["Nome"].ToString()
+                        }));
+                    }
+                }
+                return pagination;
+            }
+        }
+
+        public int Total()
+        {
+            var sql = "SELECT count(*) FROM Birthday";
+            var total = 0;
+
+            using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection)) //já faz o close
+            {
+                sqlConnection.Open();
+                total = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                
+            }
+            return total;
+
         }
     }
 }

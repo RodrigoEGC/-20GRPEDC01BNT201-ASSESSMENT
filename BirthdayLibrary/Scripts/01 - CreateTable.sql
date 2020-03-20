@@ -16,6 +16,18 @@ SELECT Id as Id, Nome as Nome, Sobrenome as Sobrenome FROM Birthday ORDER BY Dat
 
 UPDATE Birthday
 	SET 
-		Nome = 'Saul', Sobrenome = 'Hudson', DataNascimento = '1965-07-06'
+		Nome = 'Axl', Sobrenome = 'Rose', DataNascimento = '1965-07-06'
 	WHERE
-		Id = 1;
+		Id = 10;
+
+DECLARE @Limit INT = 5,
+		@Offset INT = 1;
+WITH resultado As
+	(
+		SELECT *, ROW_NUMBER() OVER (ORDER BY ID) AS Linha
+		FROM Birthday WHERE Id is not null
+	)
+	SELECT *
+		FROM resultado
+	WHERE linha >= @Offset
+		AND linha < @Offset + @limit
