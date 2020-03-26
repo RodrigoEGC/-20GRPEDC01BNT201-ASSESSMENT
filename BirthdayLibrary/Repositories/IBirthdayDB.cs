@@ -13,8 +13,5 @@ namespace BirthdayLibrary.Repositories
         void Update(BirthdayModel birthdayModel);
         BirthdayModel GetById(int Id);
         void Delete(int id);
-
-        List<BirthdayModel> Buscar(int offset, int limit );
-        int Total();
     }
 }

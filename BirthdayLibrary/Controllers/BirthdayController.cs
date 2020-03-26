@@ -1,62 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using BirthdayLibrary.Models;
-using BirthdayLibrary.Repositories;
+using BirthdayLibrary.Services;
 using Microsoft.AspNetCore.Mvc;
-
+using X.PagedList;
 
 namespace BirthdayLibrary.Controllers
 {
     public class BirthdayController : Controller
     {
-        private readonly IBirthdayDB _birthdayDB;
+        private readonly IBirthdayService _birthdayService;
 
-        public BirthdayController(IBirthdayDB birthdayDB)
+        public BirthdayController(IBirthdayService birthdayService)
         {
-            _birthdayDB = birthdayDB;
+            _birthdayService = birthdayService;
         }
         // GET: Birthday
-        public ActionResult Index()
+        public ActionResult Index(int? pagina)
         {
-            var birthday = _birthdayDB.GetAll();
-            var paginIndex = 1;
-            if (!string.IsNullOrEmpty(Request.Query["pagina"]))
-            {
-                paginIndex = Convert.ToInt32(Request.Query["pagina"]);
-            }
-            ViewBag.paginationDefault = paginIndex;
-            ViewBag.byPagin = 5;
-            ViewBag.totalRegistry = _birthdayDB.Total();
-            ViewBag.pagination = _birthdayDB.Buscar(ViewBag.byPagin, paginIndex );
-            DateTime todayBirthday = DateTime.Now;
+            var birthday = _birthdayService.GetAll();
 
-            var birthdayList = _birthdayDB.GetAll();
+            ViewBag.AniversariantesDoDia = _birthdayService.BirthdaysOfTheDay();
 
-            ViewBag.Pessoas = birthdayList;
+            ViewBag.Pessoas = _birthdayService.OrderByBirthday();
 
-            List<BirthdayModel> list = birthdayList.Where(p => p.DataNascimento.Day == todayBirthday.Day && p.DataNascimento.Month == todayBirthday.Month).ToList();
+            int paginSize = 8;
+            int paginInicial = (pagina ?? 1);
 
-            ViewBag.AniversariantesDoDia = list;
-
-            ViewBag.Pessoas = birthdayList.Where(x => x.DataNascimento.Year == todayBirthday.Year).ToList();
-
+            
             ModelState.Clear();
-            return View(birthday);
+
+            return View(birthday.ToPagedList(paginInicial, paginSize));
         }
 
         // GET: Birthday/Details/5
         public ActionResult Details(int id)
         {
-            BirthdayModel birthdayDetails = _birthdayDB.GetById(id);
-            return View(birthdayDetails);
+           BirthdayModel birthdayDetails = _birthdayService.GetById(id);
+           return View(birthdayDetails);
         }
 
         // GET: Birthday/Create
         public ActionResult Create()
         {
-            return View();
+           return View();
         }
 
         // POST: Birthday/Create
@@ -67,7 +55,7 @@ namespace BirthdayLibrary.Controllers
             try
             {
                 // TODO: Add insert logic here
-                _birthdayDB.Insert(birthdayCreate);
+               _birthdayService.Insert(birthdayCreate);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -80,7 +68,7 @@ namespace BirthdayLibrary.Controllers
         // GET: Birthday/Edit/5
         public ActionResult Edit(int id)
         {
-            BirthdayModel birthdayEdit = _birthdayDB.GetById(id);
+            BirthdayModel birthdayEdit = _birthdayService.GetById(id);
             return View(birthdayEdit);
         }
 
@@ -98,7 +86,7 @@ namespace BirthdayLibrary.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    _birthdayDB.Update(birthdayEdit);
+                    //_birthdayDB.Update(birthdayEdit);
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -112,7 +100,7 @@ namespace BirthdayLibrary.Controllers
         public IActionResult Delete(int id)
         {
             
-            BirthdayModel birthdayDelete = _birthdayDB.GetById(id);
+            BirthdayModel birthdayDelete = _birthdayService.GetById(id);
            
             return View(birthdayDelete);
         }
@@ -125,22 +113,13 @@ namespace BirthdayLibrary.Controllers
             try
             {
                 // TODO: Add delete logic here
-
-                _birthdayDB.Delete(birthdayDelete.Id);
+                _birthdayService.Delete(birthdayDelete.Id);
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
                 return View();
             }
-        }
-        public IActionResult Ordenada()
-        {
-
-            
-
-            return View();
-
         }
     }
 }

@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BirthdayLibrary.Repositories
 {
@@ -17,8 +15,6 @@ namespace BirthdayLibrary.Repositories
             _connectionString = configuration.GetValue<string>("MdfConnectionString");
         }
         
-        
-
         public void Insert(BirthdayModel birthdayModel)
         {
             var cmdText = "INSERT INTO Birthday" +
@@ -107,7 +103,7 @@ namespace BirthdayLibrary.Repositories
                 $"Nome as '{nameof(BirthdayModel.Nome)}', " +
                 $"Sobrenome as '{nameof(BirthdayModel.Sobrenome)}', " +
                 $"DataNascimento as '{nameof(BirthdayModel.DataNascimento)}' " +
-                $"FROM Birthday ORDER BY DataNascimento DESC";
+                $"FROM Birthday ORDER BY Id";
 
             var birthdayList = new List<BirthdayModel>();
 
@@ -163,51 +159,6 @@ namespace BirthdayLibrary.Repositories
 
                 sqlCommand.ExecuteNonQuery();
             }
-        }
-
-        public List<BirthdayModel> Buscar(int porPagina, int paginaCorreta)
-        {
-            var pagination = new List<BirthdayModel>();
-            var offset = 1;
-            if (paginaCorreta > 1)
-            {
-                offset = (porPagina * (paginaCorreta - 1)) + 1;
-            }
-            var sql = "DECLARE @Limit INT = " + porPagina + ", @Offset INT = " + offset + "; WITH resultado As(SELECT *, ROW_NUMBER() OVER(ORDER BY ID) AS Linha FROM Birthday WHERE Id is not null) SELECT * FROM resultado WHERE linha >= @Offset AND linha<@Offset +@limit";
-
-            using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
-            using (var sqlCommand = new SqlCommand(sql, sqlConnection)) //já faz o close
-            {
-                sqlConnection.Open();
-                using (SqlDataReader reader = sqlCommand.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        pagination.Add((new BirthdayModel()
-                        {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Nome = reader["Nome"].ToString()
-                        }));
-                    }
-                }
-                return pagination;
-            }
-        }
-
-        public int Total()
-        {
-            var sql = "SELECT count(*) FROM Birthday";
-            var total = 0;
-
-            using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
-            using (var sqlCommand = new SqlCommand(sql, sqlConnection)) //já faz o close
-            {
-                sqlConnection.Open();
-                total = Convert.ToInt32(sqlCommand.ExecuteScalar());
-                
-            }
-            return total;
-
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BirthdayLibrary.Models.BirthdayModel>
+﻿@model X.PagedList.PagedList<BirthdayLibrary.Models.BirthdayModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -7,7 +7,7 @@
     <section class="content-header">
         <h1>Index</h1>
     </section>
-
+   
     <section class="content container-fluid">
         <div class="row">
             <div class="col-lg-8 col-md-6 col-sm-12">
@@ -15,16 +15,16 @@
                     <thead>
                         <tr>
                             <th>
-                                @Html.DisplayNameFor(model => model.Id)
+                                Id
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.Nome)
+                                Nome
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.Sobrenome)
+                                Sobrenome
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.DataNascimento)
+                               Data Nascimento
                             </th>
                             <th></th>
                         </tr>
@@ -69,6 +69,36 @@
                         }
                     </tbody>
                 </table>
+                <div>
+                    Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)
+                    of @Model.PageCount
+
+                    @if (Model.HasPreviousPage)
+                    {
+                        @Html.ActionLink("<<", "Index", new { pagina = 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                        @Html.Raw(" ");
+                        @Html.ActionLink("< Anterior", "Index", new { pagina = Model.PageNumber - 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                    }
+                    else
+                    {
+                        @:<<
+                        @Html.Raw(" ");
+                        @:< Anterior
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        @Html.ActionLink("Próxima >", "Index", new { pagina = Model.PageNumber + 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                        @Html.Raw(" ");
+                        @Html.ActionLink(">>", "Index", new { pagina = Model.PageCount, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                    }
+                    else
+                    {
+                        @:Próxima >
+                        @Html.Raw(" ")
+                        @:>>
+                    }
+                </div>
             </div>
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -82,15 +112,19 @@
                                 <th>
                                     Sobrenome
                                 </th>
+                                <th>
+                                    Idade
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (BirthdayModel birthday in ViewBag.AniversariantesDoDia)
                             {
-                                <tr>
-                                    <td>@birthday.Nome</td>
-                                    <td>@birthday.Sobrenome</td>
-                                </tr>
+                            <tr>
+                                <td>@birthday.Nome</td>
+                                <td>@birthday.Sobrenome</td>
+                                <td>@birthday.DataNascimento</td>
+                            </tr>
                             }
                         </tbody>
                     </table>
