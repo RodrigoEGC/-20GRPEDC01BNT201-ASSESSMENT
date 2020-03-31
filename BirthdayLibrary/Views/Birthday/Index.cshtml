@@ -1,5 +1,6 @@
 ﻿@model X.PagedList.PagedList<BirthdayLibrary.Models.BirthdayModel>
 
+
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,6 +10,19 @@
     </section>
    
     <section class="content container-fluid">
+
+        @using (Html.BeginForm("Index", "Birthday", FormMethod.Get))
+        {
+            <div>
+                Find by: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+
+                <input name="nome" type="submit" value="Search" placeholder="Search" aria-label="Search">
+                <button title="Clean" asp-action="Index" type="button" value="clean">
+                    @Html.ActionLink("Clean", "Index")
+                </button>
+            </div>
+        }
+
         <div class="row">
             <div class="col-lg-8 col-md-6 col-sm-12">
                 <table class="table">
@@ -18,13 +32,13 @@
                                 Id
                             </th>
                             <th>
-                                Nome
+                                @Html.ActionLink("Nome", "Index", new { sorterOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter })
                             </th>
                             <th>
                                 Sobrenome
                             </th>
                             <th>
-                               Data Nascimento
+                                Data Nascimento
                             </th>
                             <th></th>
                         </tr>
@@ -70,14 +84,14 @@
                     </tbody>
                 </table>
                 <div>
-                    Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)
+                    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)
                     of @Model.PageCount
 
                     @if (Model.HasPreviousPage)
                     {
-                        @Html.ActionLink("<<", "Index", new { pagina = 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                        @Html.ActionLink("<<", "Index", new { page = 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
                         @Html.Raw(" ");
-                        @Html.ActionLink("< Anterior", "Index", new { pagina = Model.PageNumber - 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                        @Html.ActionLink("< Anterior", "Index", new { page = Model.PageNumber - 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
                     }
                     else
                     {
@@ -88,9 +102,9 @@
 
                     @if (Model.HasNextPage)
                     {
-                        @Html.ActionLink("Próxima >", "Index", new { pagina = Model.PageNumber + 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                        @Html.ActionLink("Próxima >", "Index", new { page = Model.PageNumber + 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
                         @Html.Raw(" ");
-                        @Html.ActionLink(">>", "Index", new { pagina = Model.PageCount, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
+                        @Html.ActionLink(">>", "Index", new { page = Model.PageCount, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })
                     }
                     else
                     {
@@ -112,19 +126,15 @@
                                 <th>
                                     Sobrenome
                                 </th>
-                                <th>
-                                    Idade
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (BirthdayModel birthday in ViewBag.AniversariantesDoDia)
                             {
-                            <tr>
-                                <td>@birthday.Nome</td>
-                                <td>@birthday.Sobrenome</td>
-                                <td>@birthday.DataNascimento</td>
-                            </tr>
+                                <tr>
+                                    <td>@birthday.Nome</td>
+                                    <td>@birthday.Sobrenome</td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -159,10 +169,10 @@
                 </div>
 
             </div>
-            
+
 
         </div>
-        
+
     </section>
 
 

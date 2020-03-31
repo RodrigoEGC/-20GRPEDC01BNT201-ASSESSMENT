@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BirthdayLibrary.Models;
 using BirthdayLibrary.Services;
@@ -17,21 +18,52 @@ namespace BirthdayLibrary.Controllers
             _birthdayService = birthdayService;
         }
         // GET: Birthday
-        public ActionResult Index(int? pagina)
+        
+        public ActionResult Index(string sorterOrder, string currentFilter, string searchString, int? page)
         {
             var birthday = _birthdayService.GetAll();
+
+            ViewBag.CurrentSorter = sorterOrder;
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sorterOrder) ? "name_desc" : "";
+            ViewBag.DateSortParm = sorterOrder == "Date" ? "date_desc" : "Date";
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            if(!String.IsNullOrEmpty(searchString))
+            {
+                birthday = birthday.Where(x => x.Nome.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                    || x.Sobrenome.Contains(searchString));
+            }
+            switch (sorterOrder)
+            {
+                case "name_desc":
+                    birthday = birthday.OrderByDescending(x => x.Nome) ;
+                    break;
+                case "Date":
+                    birthday = birthday.OrderByDescending(x => x.DataNascimento);
+                    break;
+                default:
+                    birthday = birthday.OrderBy(x => x.Id);
+                    break;
+            }
 
             ViewBag.AniversariantesDoDia = _birthdayService.BirthdaysOfTheDay();
 
             ViewBag.Pessoas = _birthdayService.OrderByBirthday();
 
             int paginSize = 8;
-            int paginInicial = (pagina ?? 1);
+            int paginIniTial = (page ?? 1);
 
             
             ModelState.Clear();
 
-            return View(birthday.ToPagedList(paginInicial, paginSize));
+            return View(birthday.ToPagedList(paginIniTial, paginSize));
         }
 
         // GET: Birthday/Details/5
@@ -121,5 +153,12 @@ namespace BirthdayLibrary.Controllers
                 return View();
             }
         }
+
+        // Filter by repository
+
+        //public ActionResult Search(string search)
+        //{
+        //    return View("Index", _birthdayService.Search(search));
+        //}
     }
 }

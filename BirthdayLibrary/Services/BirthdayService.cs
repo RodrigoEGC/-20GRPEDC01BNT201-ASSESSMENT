@@ -59,9 +59,18 @@ namespace BirthdayLibrary.Services
         {
             var birthdayList = _birthdayDB.GetAll();
             DateTime todayBirthday = DateTime.Now;
-            var birthdaysOfDay = birthdayList.Where(p => p.DataNascimento.Day == todayBirthday.Day && p.DataNascimento.Month == todayBirthday.Month).ToList();
+
+            var birthdaysOfDay = birthdayList.Where(p =>
+                p.DataNascimento.Day == todayBirthday.Day && 
+                p.DataNascimento.Month == todayBirthday.Month
+            ).ToList();
 
             return birthdaysOfDay;
+        }
+
+        public IEnumerable<BirthdayModel> Search(string search)
+        {
+            return _birthdayDB.Search(search);
         }
     }
 }

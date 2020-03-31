@@ -16,7 +16,5 @@ namespace BirthdayLibrary.Models
 
         [DataType(DataType.Date)]
         public DateTime DataNascimento { get; set; }
-
-        public int Idade { get; set; }
     }
 }

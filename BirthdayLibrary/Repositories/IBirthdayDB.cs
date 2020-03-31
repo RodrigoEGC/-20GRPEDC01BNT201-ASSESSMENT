@@ -13,5 +13,6 @@ namespace BirthdayLibrary.Repositories
         void Update(BirthdayModel birthdayModel);
         BirthdayModel GetById(int Id);
         void Delete(int id);
+        IEnumerable<BirthdayModel> Search(string search);
     }
 }

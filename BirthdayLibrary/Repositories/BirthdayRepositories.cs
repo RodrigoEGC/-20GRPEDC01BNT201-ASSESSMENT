@@ -17,12 +17,12 @@ namespace BirthdayLibrary.Repositories
         
         public void Insert(BirthdayModel birthdayModel)
         {
-            var cmdText = "INSERT INTO Birthday" +
+            var sqlQuery = "INSERT INTO Birthday" +
                 "		(Nome, Sobrenome, DataNascimento)" +
                 "VALUES	(@nome, @sobrenome, @dataNascimento);";
 
             using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
-            using (var sqlCommand = new SqlCommand(cmdText, sqlConnection)) //já faz o close
+            using (var sqlCommand = new SqlCommand(sqlQuery, sqlConnection)) //já faz o close
             {
                 sqlCommand.CommandType = CommandType.Text;
 
@@ -40,10 +40,10 @@ namespace BirthdayLibrary.Repositories
 
         public void Update(BirthdayModel birthdayModel)
         {
-            var cmdText = "UPDATE Birthday SET Nome = @nome, Sobrenome = @sobrenome, DataNascimento = @dataNascimento WHERE Id = @id";
+            var sqlQuery = "UPDATE Birthday SET Nome = @nome, Sobrenome = @sobrenome, DataNascimento = @dataNascimento WHERE Id = @id";
 
             using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
-            using (var sqlCommand = new SqlCommand(cmdText, sqlConnection)) //já faz o close
+            using (var sqlCommand = new SqlCommand(sqlQuery, sqlConnection)) //já faz o close
             {
                 sqlCommand.CommandType = CommandType.Text;
 
@@ -98,7 +98,7 @@ namespace BirthdayLibrary.Repositories
 
         public IEnumerable<BirthdayModel> GetAll()
         {
-            var cmdText = $"SELECT " +
+            var sqlQuery = $"SELECT " +
                 $"Id as '{nameof(BirthdayModel.Id)}', " +
                 $"Nome as '{nameof(BirthdayModel.Nome)}', " +
                 $"Sobrenome as '{nameof(BirthdayModel.Sobrenome)}', " +
@@ -108,7 +108,7 @@ namespace BirthdayLibrary.Repositories
             var birthdayList = new List<BirthdayModel>();
 
             using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
-            using (var sqlCommand = new SqlCommand(cmdText, sqlConnection)) //já faz o close
+            using (var sqlCommand = new SqlCommand(sqlQuery, sqlConnection)) //já faz o close
             {
                 sqlCommand.CommandType = CommandType.Text;
 
@@ -145,10 +145,10 @@ namespace BirthdayLibrary.Repositories
 
         public void Delete(int id)
         {
-            var sql = "DELETE FROM Birthday WHERE Id = @id";
+            var sqlQuery = "DELETE FROM Birthday WHERE Id = @id";
 
             using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
-            using (var sqlCommand = new SqlCommand(sql, sqlConnection)) //já faz o close
+            using (var sqlCommand = new SqlCommand(sqlQuery, sqlConnection)) //já faz o close
             {
                 sqlCommand.CommandType = CommandType.Text;
 
@@ -159,6 +159,38 @@ namespace BirthdayLibrary.Repositories
 
                 sqlCommand.ExecuteNonQuery();
             }
+        }
+
+        public IEnumerable<BirthdayModel> Search(string search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return GetAll();
+            }
+            var sql = $"SELECT " +
+                $"Id as '{nameof(BirthdayModel.Id)}', " +
+                $"Nome as '{nameof(BirthdayModel.Nome)}', " +
+                $"Sobrenome as '{nameof(BirthdayModel.Sobrenome)}', " +
+                $"DataNascimento as '{nameof(BirthdayModel.DataNascimento)}' " +
+                $"FROM Birthday " +
+                $"{Environment.NewLine}WHERE Nome = @nome" +
+                $"{Environment.NewLine}ORDER BY Id";
+
+            var searching = new List<BirthdayModel>();
+
+            using (var sqlConnection = new SqlConnection(_connectionString)) //já faz o close e dispose
+            using (var sqlCommand = new SqlCommand(sql, sqlConnection)) //já faz o close
+            {
+                sqlCommand.CommandType = CommandType.Text;
+
+                sqlCommand.Parameters
+                    .Add("@nome", SqlDbType.VarChar).Value = search;
+
+                sqlConnection.Open();
+            }
+
+            return searching;
+
         }
     }
 }

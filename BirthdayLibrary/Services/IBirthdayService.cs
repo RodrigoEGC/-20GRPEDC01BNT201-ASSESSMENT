@@ -14,5 +14,7 @@ namespace BirthdayLibrary.Services
 
         IEnumerable<BirthdayModel> BirthdaysOfTheDay();
 
+        IEnumerable<BirthdayModel> Search(string search);
+
     }
 }
