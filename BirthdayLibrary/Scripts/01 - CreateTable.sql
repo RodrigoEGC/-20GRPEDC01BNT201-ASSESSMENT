@@ -6,7 +6,7 @@
 );
 
 INSERT INTO Birthday (Nome, Sobrenome, DataNascimento) 
-VALUES ('Ozzy', 'Osbourne', '1948-12-03');
+VALUES ('Amy', 'Lee', '1981-12-13');
 
 SELECT * FROM Birthday;
 

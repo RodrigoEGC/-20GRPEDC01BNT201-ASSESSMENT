@@ -25,7 +25,7 @@ namespace BirthdayLibrary.Controllers
 
             ViewBag.CurrentSorter = sorterOrder;
             ViewBag.NameSortParm = String.IsNullOrEmpty(sorterOrder) ? "name_desc" : "";
-            ViewBag.DateSortParm = sorterOrder == "Date" ? "date_desc" : "Date";
+            ViewBag.SobrenomeSortParm = String.IsNullOrEmpty(sorterOrder) ? "sobrenome_desc" : "";
 
             if (searchString != null)
             {
@@ -45,8 +45,8 @@ namespace BirthdayLibrary.Controllers
                 case "name_desc":
                     birthday = birthday.OrderByDescending(x => x.Nome) ;
                     break;
-                case "Date":
-                    birthday = birthday.OrderByDescending(x => x.DataNascimento);
+                case "sobrenome_desc":
+                    birthday = birthday.OrderByDescending(x => x.Sobrenome);
                     break;
                 default:
                     birthday = birthday.OrderBy(x => x.Id);
@@ -54,7 +54,6 @@ namespace BirthdayLibrary.Controllers
             }
 
             ViewBag.AniversariantesDoDia = _birthdayService.BirthdaysOfTheDay();
-
             ViewBag.Pessoas = _birthdayService.OrderByBirthday();
 
             int paginSize = 8;
