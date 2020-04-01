@@ -108,6 +108,7 @@ namespace BirthdayLibrary.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind]BirthdayModel birthdayEdit)
         {
+            
             try
             {
                 // TODO: Add update logic here
@@ -117,7 +118,7 @@ namespace BirthdayLibrary.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    //_birthdayDB.Update(birthdayEdit);
+                    _birthdayService.Update(birthdayEdit);
                 }
                 return RedirectToAction(nameof(Index));
             }
