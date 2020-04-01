@@ -33,7 +33,7 @@ namespace BirthdayLibrary.Services
         {
             if(birthdayModel == null)
                 throw new ArgumentNullException("Error");
-            if (string.IsNullOrWhiteSpace(birthdayModel.Nome) || birthdayModel.Nome.Length < 4)
+            if (string.IsNullOrWhiteSpace(birthdayModel.Nome) || birthdayModel.Nome.Length < 3)
                 throw new ArgumentException("Nome da pessoa inválido");
             _birthdayDB.Insert(birthdayModel);
         }
